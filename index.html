@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sof by Gushwork — AI Inbound SDR (Trial · Softrol Systems)</title>
+<style>
+  :root{
+    --ink:#14202e; --ink-2:#3b4a5a; --muted:#728196; --faint:#aab4c0;
+    --line:#e3e8ee; --line-2:#eef2f6; --surface:#ffffff; --bg:#f1f4f8; --bg-2:#f6f8fa;
+    --teal:#0f766e; --teal-d:#0b5852; --teal-soft:#e6f1ef;
+    --green:#15803d; --green-soft:#e7f3ea;
+    --blue:#1d4ed8; --blue-soft:#e7edfb;
+    --amber:#b45309; --amber-soft:#fbf0df;
+    --radius:13px; --shadow:0 1px 2px rgba(20,32,46,.04),0 6px 22px rgba(20,32,46,.06);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
+  button{font-family:inherit;cursor:pointer}
+  .hidden{display:none!important}
+
+  /* ---------------- LOGIN ---------------- */
+  #login{min-height:100vh;display:grid;place-items:center;background:radial-gradient(1200px 600px at 50% -10%,#1b2c3d,#14202e)}
+  .login-card{background:#fff;width:380px;max-width:92vw;border-radius:18px;padding:34px 32px 30px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+  .login-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em;margin-bottom:3px}
+  .login-brand .mk{width:26px;height:26px;border-radius:7px;background:var(--teal);display:grid;place-items:center;color:#fff;font-size:14px;font-weight:800}
+  .login-brand small{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:0}
+  .login-sub{color:var(--muted);font-size:13px;margin:6px 0 22px}
+  .lab{font-size:12px;font-weight:600;color:var(--ink-2);margin:14px 0 5px;display:block}
+  .inp{width:100%;font-size:14px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;outline:none;color:var(--ink)}
+  .inp:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,118,110,.12)}
+  .btn{border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:650}
+  .btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--teal-d)}
+  .btn-block{width:100%;margin-top:20px}
+  .login-note{font-size:11.5px;color:var(--faint);text-align:center;margin-top:16px;line-height:1.5}
+  .login-note b{color:var(--muted)}
+
+  /* ---------------- APP SHELL ---------------- */
+  #app{display:flex;min-height:100vh}
+  .sidebar{width:222px;flex-shrink:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .sb-brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;letter-spacing:-.02em;padding:18px 18px 16px;border-bottom:1px solid #25364a}
+  .sb-brand .mk{width:24px;height:24px;border-radius:6px;background:var(--teal);display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+  .sb-brand small{display:block;font-weight:500;color:#8298ab;font-size:10.5px;letter-spacing:.02em}
+  .nav{padding:12px 10px;flex:1;display:flex;flex-direction:column;gap:2px}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;color:#c0cdda;font-size:13.5px;font-weight:550;background:none;border:none;text-align:left;width:100%}
+  .nav-item:hover{background:#1e2f41;color:#fff}
+  .nav-item.active{background:var(--teal);color:#fff}
+  .nav-item .ic{width:17px;height:17px;flex-shrink:0;opacity:.95}
+  .nav-item .badge{margin-left:auto;font-size:10.5px;font-weight:700;background:#2a3c50;color:#cdd9e4;border-radius:999px;padding:1px 7px}
+  .nav-item.active .badge{background:rgba(255,255,255,.22);color:#fff}
+  .nav-sep{font-size:10px;font-weight:700;letter-spacing:.1em;color:#5e718a;text-transform:uppercase;padding:14px 12px 6px}
+  .account{border-top:1px solid #25364a;padding:13px 16px;display:flex;align-items:center;gap:10px}
+  .account .av{width:32px;height:32px;border-radius:8px;background:#2b3e52;display:grid;place-items:center;font-size:12px;font-weight:700;color:#cfe0ee}
+  .account .nm{font-size:12.5px;font-weight:650}
+  .account .rl{font-size:11px;color:#8298ab}
+  .account .out{margin-left:auto;background:none;border:none;color:#7990a4;font-size:11px}
+  .account .out:hover{color:#fff;text-decoration:underline}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;gap:12px;padding:16px 28px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .topbar h1{margin:0;font-size:18px;font-weight:750;letter-spacing:-.02em}
+  .topbar .crumb{font-size:12.5px;color:var(--muted)}
+  .topbar .spacer{flex:1}
+  .sof-voicehint{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:650;color:#0b5852;background:var(--teal-soft);border:1px solid #cfe6e1;padding:5px 10px;border-radius:999px;cursor:default}
+  .sof-voicehint.hidden{display:none}
+  .sof-status{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--teal-d);background:var(--teal-soft);border:1px solid #cfe5e1;padding:5px 11px;border-radius:999px;font-weight:600}
+  .sof-status .dot{width:8px;height:8px;border-radius:50%;background:#22b8a6;box-shadow:0 0 0 3px rgba(34,184,166,.25);animation:pulse 1.9s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,184,166,.4)}70%{box-shadow:0 0 0 6px rgba(34,184,166,0)}100%{box-shadow:0 0 0 0 rgba(34,184,166,0)}}
+  .content{padding:24px 28px 48px;overflow-y:auto}
+
+  /* ---------------- shared bits ---------------- */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card-h{padding:14px 17px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;justify-content:space-between}
+  .card-h h3{margin:0;font-size:14px;font-weight:700;letter-spacing:-.01em}
+  .card-h .meta{font-size:11.5px;color:var(--muted)}
+  .badge2{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:650;padding:2px 9px;border-radius:999px;white-space:nowrap}
+  .b-phone{background:var(--blue-soft);color:var(--blue)} .b-email{background:var(--teal-soft);color:var(--teal-d)}
+  .b-text{background:var(--green-soft);color:var(--green)} .b-off{background:var(--amber-soft);color:var(--amber)}
+  .b-booked{background:var(--green-soft);color:var(--green)} .b-prog{background:var(--amber-soft);color:var(--amber)}
+  .b-neutral{background:var(--bg-2);color:var(--muted);border:1px solid var(--line)}
+  .pageintro{font-size:13.5px;color:var(--ink-2);margin:-4px 0 18px;max-width:760px}
+
+  /* metrics */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}
+  .kpi .icn{width:30px;height:30px;border-radius:8px;background:var(--teal-soft);display:grid;place-items:center;margin-bottom:11px}
+  .kpi .icn svg{width:16px;height:16px;color:var(--teal)}
+  .kpi .n{font-size:26px;font-weight:780;letter-spacing:-.02em}
+  .kpi .n small{font-size:14px;color:var(--muted);font-weight:650}
+  .kpi .l{font-size:12px;color:var(--muted);margin-top:2px}
+  .kpi .d{font-size:11px;font-weight:650;color:var(--green);margin-top:6px}
+
+  .two{display:grid;grid-template-columns:1.55fr 1fr;gap:18px;align-items:start}
+  .feed{padding:6px 4px}
+  .feed .row{display:flex;gap:12px;padding:11px 13px;border-radius:10px}
+  .feed .row:hover{background:var(--bg-2)}
+  .feed .ic{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:grid;place-items:center}
+  .feed .ic svg{width:16px;height:16px}
+  .feed .tx{flex:1;font-size:13px}
+  .feed .tx b{font-weight:650}
+  .feed .tx .sub{color:var(--muted);font-size:12px}
+  .feed .when{font-size:11.5px;color:var(--faint);white-space:nowrap}
+
+  .src-bars{padding:16px 17px}
+  .src-bar{margin-bottom:14px}
+  .src-bar .t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+  .src-bar .t .v{font-weight:700;color:var(--ink)}
+  .src-bar .track{height:9px;background:var(--line-2);border-radius:99px;overflow:hidden}
+  .src-bar .track i{display:block;height:100%;border-radius:99px;transition:width .9s cubic-bezier(.22,1,.36,1)}
+
+  /* lists / tables */
+  .list{overflow:hidden}
+  .lrow{display:flex;align-items:center;gap:14px;padding:14px 17px;border-bottom:1px solid var(--line-2);background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left}
+  .lrow:last-child{border-bottom:none}
+  .lrow:hover{background:var(--bg-2)}
+  .lrow .av{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1d8f84,#0f766e);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex-shrink:0}
+  .lrow .main-c{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .lrow .nm{font-size:13.5px;font-weight:650;color:var(--ink)}
+  .lrow .co{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lrow .mid{font-size:12.5px;color:var(--ink-2);width:230px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lrow .rt{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;width:150px}
+  .lrow .rt .when{font-size:11px;color:var(--faint)}
+  .lrow .chev{color:var(--faint);font-size:16px;flex-shrink:0}
+  @media(max-width:760px){.lrow .mid{display:none}.lrow .rt{width:auto}}
+
+  /* detail */
+  .back{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--teal);background:none;border:none;padding:0;margin-bottom:14px}
+  .back:hover{color:var(--teal-d)}
+  .dhead{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .dhead .av{width:50px;height:50px;border-radius:13px;background:linear-gradient(135deg,#1d8f84,#0f766e);color:#fff;display:grid;place-items:center;font-size:17px;font-weight:700;flex-shrink:0}
+  .dhead .nm{font-size:19px;font-weight:760;letter-spacing:-.01em}
+  .dhead .ti{font-size:13px;color:var(--ink-2)}
+  .dhead .co{font-size:12.5px;color:var(--muted)}
+  .dhead .tags{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap}
+  .dhead .spacer{flex:1}
+  .respnote{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--green);background:var(--green-soft);border:1px solid #cfe7d6;border-radius:9px;padding:8px 12px;margin-bottom:16px}
+  .respnote svg{width:16px;height:16px;flex-shrink:0}
+  .bookcard .bt svg{width:15px;height:15px}
+  .back svg{width:14px;height:14px}
+
+  .detail-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:18px;align-items:start}
+  @media(max-width:900px){.detail-grid,.two{grid-template-columns:1fr}}
+
+  /* transcript */
+  .transcript{padding:15px 17px;max-height:520px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+  .turn .who{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .turn.ai .who{color:var(--teal)} .turn.cust .who{color:var(--blue)} .turn.rep .who{color:var(--teal)}
+  .turn .tx{font-size:13px;color:var(--ink-2);line-height:1.5}
+
+  /* notes */
+  .nblock{margin-bottom:15px}
+  .nblock:last-child{margin-bottom:0}
+  .nblock h4{margin:0 0 7px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .nblock h4 svg{width:14px;height:14px;color:var(--teal)}
+  .nblock p{margin:0;font-size:13px;color:var(--ink-2);line-height:1.5}
+  .qual{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .qcell{background:var(--bg-2);border:1px solid var(--line);border-radius:9px;padding:8px 11px}
+  .qcell .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .qcell .v{font-size:12.5px;font-weight:600;margin-top:2px}
+  .li{display:flex;gap:8px;font-size:13px;padding:4px 0;color:var(--ink-2)}
+  .li .b{color:var(--teal);font-weight:700;flex-shrink:0}
+  .li.obj .b{color:var(--amber)}
+  .gapflag{background:var(--amber-soft);border:1px solid #f0dcbb;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#7c4a0e;line-height:1.5}
+  .gapflag b{color:#7c4a0e}
+
+  /* profile */
+  .pfield{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-2);font-size:12.5px}
+  .pfield:last-child{border-bottom:none}
+  .pfield .k{color:var(--muted);width:84px;flex-shrink:0}
+  .pfield .v{color:var(--ink);font-weight:500}
+  .tag{display:inline-block;background:var(--teal-soft);color:var(--teal-d);font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;margin:0 4px 4px 0}
+
+  /* form card */
+  .formcard{padding:15px 17px}
+  .formcard .fr{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line-2);font-size:12.5px}
+  .formcard .fr:last-child{border-bottom:none}
+  .formcard .fr .k{color:var(--muted)} .formcard .fr .v{color:var(--ink);font-weight:550;text-align:right}
+  .formcard .msg{margin-top:10px;background:var(--bg-2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:12.5px;color:var(--ink-2);font-style:italic}
+
+  /* conversation (interactive) */
+  .convo{padding:16px 17px;display:flex;flex-direction:column;gap:12px;min-height:320px}
+  .cmsg{display:flex;gap:9px;max-width:88%}
+  .cmsg .cav{width:26px;height:26px;border-radius:7px;flex-shrink:0;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff}
+  .cmsg.ai .cav{background:var(--teal)} .cmsg.cust{align-self:flex-end;flex-direction:row-reverse} .cmsg.cust .cav{background:#475569}
+  .cbub{font-size:13px;line-height:1.5;padding:9px 13px;border-radius:13px}
+  .cmsg.ai .cbub{background:var(--bg-2);border:1px solid var(--line);border-top-left-radius:4px;color:var(--ink)}
+  .cmsg.cust .cbub{background:var(--ink);color:#fff;border-top-right-radius:4px}
+  .cmsg .subj{font-size:10.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+  .opts{display:flex;flex-direction:column;gap:8px;padding:6px 2px 2px}
+  .opts .lbl{font-size:11px;color:var(--muted);font-weight:600}
+  .opt{text-align:left;background:#fff;border:1.5px solid var(--teal);color:var(--teal-d);border-radius:11px;padding:10px 13px;font-size:12.5px;font-weight:550}
+  .opt:hover{background:var(--teal-soft)}
+  .opt .role{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:1px}
+  .bookcard{background:var(--green-soft);border:1px solid #cfe7d6;border-radius:11px;padding:13px 15px;margin-top:4px}
+  .bookcard .bt{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em}
+  .bookcard .bm{font-size:14px;font-weight:650;color:var(--ink);margin-top:4px}
+  .bookcard .bd{font-size:12px;color:var(--ink-2);margin-top:2px}
+  .typing-c{display:flex;gap:4px;padding:10px 13px}
+  .typing-c span{width:6px;height:6px;border-radius:50%;background:#9aa7b6;animation:blink 1.2s infinite}
+  .typing-c span:nth-child(2){animation-delay:.2s}.typing-c span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+  /* actions row */
+  .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+  .abtn{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:600;color:var(--ink-2);display:inline-flex;align-items:center;gap:7px}
+  .abtn:hover{border-color:var(--teal);color:var(--teal-d)}
+  .abtn svg{width:14px;height:14px}
+  .abtn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .abtn.primary:hover{background:var(--teal-d);color:#fff}
+
+  /* co-pilot aggregate */
+  .agg{display:grid;grid-template-columns:1fr 1.1fr;gap:18px;align-items:start;margin-bottom:20px}
+  .bars{padding:15px 17px}
+  .bar{margin-bottom:12px}
+  .bar:last-child{margin-bottom:0}
+  .bar .bl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+  .bar .bl .pct{color:var(--muted);font-weight:650}
+  .bar .track{height:8px;background:var(--line-2);border-radius:99px;overflow:hidden}
+  .bar .track i{display:block;height:100%;background:var(--teal);border-radius:99px;width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
+  .bar.amber .track i{background:var(--amber)}
+  .gapbig{background:linear-gradient(180deg,#fff,var(--amber-soft));border:1px solid #f0dcbb;border-radius:13px;padding:17px 18px;box-shadow:var(--shadow)}
+  .gapbig .ft{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--amber)}
+  .gapbig .ft svg{width:14px;height:14px}
+  .gapbig h3{margin:9px 0 5px;font-size:16px;font-weight:750;letter-spacing:-.01em;color:var(--ink)}
+  .gapbig p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+  .gapbig .row{display:flex;gap:22px;margin-top:13px;flex-wrap:wrap}
+  .gapbig .st .sn{font-size:18px;font-weight:760;color:var(--ink)}
+  .gapbig .st .sl{font-size:10.5px;color:var(--muted)}
+  .copilot-banner{display:flex;gap:10px;align-items:flex-start;background:var(--teal-soft);border:1px solid #cfe5e1;border-radius:11px;padding:12px 15px;font-size:13px;color:var(--teal-d);margin-bottom:18px}
+  .copilot-banner svg{width:17px;height:17px;flex-shrink:0;margin-top:1px;color:var(--teal)}
+  .insight-line{display:flex;gap:9px;font-size:13px;padding:5px 0;color:var(--ink-2)}
+  .insight-line .k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);width:88px;flex-shrink:0;padding-top:2px}
+
+  /* toast */
+  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13px;font-weight:550;padding:11px 18px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.25s;z-index:50;display:flex;align-items:center;gap:9px}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast svg{width:15px;height:15px;color:#34d399}
+
+  .secn{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink);text-transform:uppercase;margin:0 0 11px}
+
+  /* stage badges + control */
+  .b-stage{border:1px solid transparent}
+  .s-new{background:var(--blue-soft);color:var(--blue)}
+  .s-prog{background:var(--amber-soft);color:var(--amber)}
+  .s-booked{background:var(--teal-soft);color:var(--teal-d)}
+  .s-won{background:var(--green-soft);color:var(--green)}
+  .s-lost{background:#fdeceb;color:#b42318}
+  .stagebox{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 14px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .stagebox .lab{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .stage-pills{display:flex;gap:6px;flex-wrap:wrap}
+  .spill{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted)}
+  .spill:hover{border-color:var(--muted)}
+  .spill.on{cursor:default}
+  .spill.on.s-new{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
+  .spill.on.s-prog{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
+  .spill.on.s-booked{border-color:var(--teal);color:var(--teal-d);background:var(--teal-soft)}
+  .spill.on.s-won{border-color:var(--green);color:var(--green);background:var(--green-soft)}
+  .spill.on.s-lost{border-color:#b42318;color:#b42318;background:#fdeceb}
+  /* pipeline mini */
+  .pipe{padding:14px 17px}
+  .pipe-row{display:flex;align-items:center;gap:10px;padding:7px 0}
+  .pipe-row .nm{font-size:12.5px;color:var(--ink-2);width:118px;flex-shrink:0}
+  .pipe-row .track{flex:1;height:8px;background:var(--line-2);border-radius:99px;overflow:hidden}
+  .pipe-row .track i{display:block;height:100%;border-radius:99px;width:0;transition:width .9s cubic-bezier(.22,1,.36,1)}
+  .pipe-row .ct{font-size:12px;font-weight:700;color:var(--ink);width:24px;text-align:right}
+  /* calendar (tab) */
+  .cal-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .cal-grid{display:grid;grid-template-columns:repeat(5,1fr)}
+  .cal-col{border-right:1px solid var(--line-2);min-height:280px}
+  .cal-col:last-child{border-right:none}
+  .cal-head{padding:10px 12px;border-bottom:1px solid var(--line-2);text-align:center}
+  .cal-head .dow{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .cal-head .dt{font-size:15px;font-weight:750;color:var(--ink);margin-top:1px}
+  .cal-body{padding:9px;display:flex;flex-direction:column;gap:8px}
+  .cal-ev{border:none;text-align:left;width:100%;border-radius:9px;padding:8px 10px;border-left:3px solid var(--teal);background:var(--teal-soft)}
+  .cal-ev.eng-priya{background:var(--blue-soft);border-left-color:var(--blue)}
+  .cal-ev:hover{filter:brightness(.97)}
+  .cal-ev .t{font-size:11px;font-weight:700;color:var(--ink)}
+  .cal-ev .n{font-size:12px;font-weight:650;color:var(--ink);margin-top:2px;line-height:1.25}
+  .cal-ev .c{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cal-ev .w{font-size:10.5px;color:var(--muted);margin-top:3px}
+  .cal-empty{font-size:18px;color:var(--faint);text-align:center;padding:18px 4px}
+  /* mini calendar (dashboard) */
+  .mcal{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px 16px}
+  .mcal .d{border:1px solid var(--line-2);border-radius:10px;padding:8px;min-height:92px}
+  .mcal .d .h{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center;margin-bottom:6px}
+  .mcal .chip{font-size:10px;font-weight:600;border-radius:6px;padding:3px 6px;margin-bottom:4px;line-height:1.3;border:none;text-align:left;width:100%;color:var(--teal-d);background:var(--teal-soft)}
+  .mcal .chip.eng-priya{background:var(--blue-soft);color:var(--blue)}
+  @media(max-width:880px){
+    #app{flex-direction:column}
+    .sidebar{width:100%;height:auto;position:static;flex-direction:column}
+    .nav{flex-direction:row;overflow-x:auto;padding:8px}
+    .nav-item{white-space:nowrap}.nav-item .badge{display:none}
+    .account{display:none}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .agg{grid-template-columns:1fr}
+    .content{padding:18px 16px 40px}
+    .mcal{grid-template-columns:repeat(2,1fr)}
+    .cal-grid{grid-template-columns:1fr}
+    .cal-col{border-right:none;border-bottom:1px solid var(--line-2);min-height:0}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login">
+  <div class="login-card">
+    <div class="login-brand"><span class="mk">S</span> Sof <small>by Gushwork</small></div>
+    <div class="login-sub">AI Inbound SDR — trial workspace for <b>Softrol Systems</b></div>
+    <label class="lab">Work email</label>
+    <input class="inp" id="li-email" type="email" value="marcus.bell@softrol.com" />
+    <label class="lab">Password</label>
+    <input class="inp" id="li-pass" type="password" value="••••••••••" />
+    <button class="btn btn-primary btn-block" id="li-go">Sign in</button>
+    <div class="login-note">Demo workspace · credentials are pre-filled.<br><b>Sign in</b> to explore the leads Sof has already handled.</div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app" class="hidden">
+  <aside class="sidebar">
+    <div class="sb-brand"><span class="mk">S</span><div>Sof<small>by Gushwork</small></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="account">
+      <div class="av">MB</div>
+      <div><div class="nm">Marcus Bell</div><div class="rl">Sales Engineer · Softrol</div></div>
+      <button class="out" id="logout">Sign out</button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div><h1 id="pageTitle">Dashboard</h1><div class="crumb" id="crumb"></div></div>
+      <div class="spacer"></div>
+      <div class="sof-voicehint hidden" id="voiceHint" title="Real voice agent — tap “Talk to Sof”, bottom-right, to speak">🎤 Live voice</div>
+      <div class="sof-status"><span class="dot"></span> Sof is live · answering 24/7</div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================================
+   Sof by Gushwork — AI Inbound SDR · product trial (fully scripted, offline)
+   ========================================================================= */
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const initials = n => n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+
+/* ---------- ICONS (inline svg) ---------- */
+const SVG = {
+  dash:'<path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 9h8V3h-8z"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.94.36 1.86.7 2.74a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.34-1.34a2 2 0 0 1 2.11-.45c.88.34 1.8.57 2.74.7A2 2 0 0 1 22 16.92z"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/>',
+  layers:'<path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/>',
+  spark:'<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>',
+  bolt:'<path d="M13 2 3 14h8l-1 8 10-12h-8z"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/>',
+  inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+  chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m22 4-10 10.01-3-3"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  warn:'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4m0 4h.01"/>',
+  bulb:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2h6c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  notes:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>',
+  arrow:'<path d="M5 12h14M12 5l7 7-7 7"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'
+};
+const ico = (k,cls="ic") => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${SVG[k]}</svg>`;
+
+function chanBadge(ch, off){
+  const map={Phone:["b-phone","phone"],Email:["b-email","mail"],Text:["b-text","chat"]};
+  const [cls]=map[ch]||["b-neutral"];
+  return `<span class="badge2 ${cls}">${ch}</span>` + (off?`<span class="badge2 b-off">Off-hours</span>`:"");
+}
+const bookedBadge = '<span class="badge2 b-booked">Meeting booked</span>';
+
+/* ========================== SEED DATA ========================== */
+
+/* ----- Off-hours calls (AI answered) ----- */
+const CALLS = [
+{
+  id:"c1", name:"Dale Morrison", title:"Plant Operations Manager",
+  company:"Crestline Uniform & Linen", location:"Chattanooga, TN · ~$28M",
+  channel:"Phone", off:true, when:"Fri · 7:43 PM", interest:"Garment Sort System",
+  resp:"Answered by Sof in 2 rings · human team was offline",
+  who:"Marcus Bell", stage:"Meeting Booked",
+  placement:{day:3,time:"11:00 AM",hour:11},
+  steps:[
+    {ai:"Thanks for calling Softrol Systems — you've reached Sof, Softrol's AI assistant. Our team's offline right now, but I can help and line up the right engineer. What's going on at your plant?",
+     opts:["Our garment sorting is backed up — by mid-afternoon we miss shipping windows.","We're growing fast and our manual garment sort just can't keep up."]},
+    {ai:"That afternoon pile-up is one of the most common things we fix. Roughly how many garments a day are you moving, and is sorting manual today?",
+     opts:["About 12,000 a day, all manual — we've even turned down two contracts over turnaround.","Around 12,000 a day by hand, and it's getting worse every week."]},
+    {ai:"That's real money walking out the door — a modular garment sort feeds shipping steadily instead of one big manual push. Two quick things: any space constraints, and are you weighing another vendor?",
+     opts:["Space is tight — about 35,000 sq ft, and it has to tie into our overhead rail. And yes, one competitor has a compact unit.","Floor space mainly — I won't pour a new slab — and there's one other vendor with a smaller unit."]},
+    {ai:"Helpful. Ours is modular so it scales within your footprint and integrates with existing rail, and I'll have our engineer bring exact footprint numbers so you can compare honestly. Let's get you a 30-minute scoping call with Marcus Bell — Thursday 11:00 AM ET or Friday 9:00 AM ET?",
+     isSlot:true, times:["Thu, Jun 18 · 11:00 AM ET","Fri, Jun 19 · 9:00 AM ET"], placements:[{day:3,time:"11:00 AM",hour:11},{day:4,time:"9:00 AM",hour:9}], opts:["Thursday 11:00 AM works.","Friday 9:00 AM is better."]},
+    {ai:"Done — {time} with Marcus. A calendar invite's on its way, and he'll have everything we covered, so you won't repeat yourself. Talk soon, Dale.", final:true, with:"Marcus Bell"}
+  ],
+  notes:{
+    summary:"Crestline Uniform & Linen (~12,000 garments/day, ~35,000 sq ft) has a manual garment-sort bottleneck causing missed afternoon shipping — already lost two rental contracts. Strong fit for modular Garment Sort. Footprint-sensitive; comparing one competitor with a compact unit. Wants it live before peak season (~90 days).",
+    qual:{Need:"Strong — bottleneck losing contracts",Authority:"Ops manager; owner approves capital",Timeline:"~90 days, before peak season",Budget:"Must beat cost of an added shift"},
+    actions:["Send footprint specs for 24-rail modular garment sort","Confirm integration with existing overhead rail","Prepare ROI vs. one added manual shift","Marcus to run 30-min scoping call (Thu 11:00 AM ET)"],
+    objections:["Tight floor space — footprint is the deal-breaker","Competitor offers a smaller compact unit"],
+    gap:"Footprint is the blocker and a competitor's compact sorter is the threat — a smaller-footprint garment sorter is a clear product-gap signal.",
+    sentiment:"Motivated and time-pressured; actively comparing one competitor."
+  },
+  profile:{interest:["Garment Sort System"],pains:["Afternoon sort bottleneck","Tight floor space"],size:"12,000 garments/day · ~35,000 sq ft",timeline:"~90 days (pre-peak)",channels:["Off-hours phone call"],meeting:"Thu, Jun 18 · 11:00 AM ET — Marcus Bell"}
+},
+{
+  id:"c2", name:"Rosa Alvarez", title:"Director of Operations",
+  company:"Summit Healthcare Linen", location:"Knoxville, TN · ~$45M",
+  channel:"Phone", off:true, when:"Sat · 8:20 AM", interest:"Chemical Systems (Catalyst) + Wash Aisle",
+  resp:"Answered by Sof on a Saturday · human team was offline",
+  who:"Priya Nair", stage:"Meeting Booked",
+  placement:{day:0,time:"2:00 PM",hour:14},
+  steps:[
+    {ai:"Softrol Systems, this is Sof — Softrol's AI assistant. We're outside business hours but I can absolutely help. What can I do for you?",
+     opts:["We run healthcare linen — chemical costs keep climbing and we need airtight compliance documentation.","Our chemical spend is too high and prepping for audits is a nightmare."]},
+    {ai:"Both are right in our wheelhouse. Our Catalyst system doses with flow-meter accuracy and records every dose — exactly what auditors want. How many tunnels are you running?",
+     opts:["Three tunnels, high volume, and we're audited regularly.","Three tunnels — and the records matter as much as the savings."]},
+    {ai:"Then Catalyst plus our wash-aisle controls give you dose accuracy and the audit trail in one place. Is there a budget window you're working toward?",
+     opts:["We'd be looking at our Q3 budget cycle.","Soon — likely the Q3 budget."]},
+    {ai:"Perfect timing to scope it now. I'll set you up with Priya Nair, our chemical-systems engineer — she'll bring a sample compliance report and a savings estimate. Monday 2:00 PM ET or Wednesday 1:00 PM ET?",
+     isSlot:true, times:["Mon, Jun 15 · 2:00 PM ET","Wed, Jun 17 · 1:00 PM ET"], placements:[{day:0,time:"2:00 PM",hour:14},{day:2,time:"1:00 PM",hour:13}], opts:["Monday 2:00 PM works.","Wednesday 1:00 PM is better."]},
+    {ai:"Booked — {time} with Priya. You'll get an invite plus a one-page Catalyst overview, and she'll come prepared on the compliance side. Have a good weekend, Rosa.", final:true, with:"Priya Nair"}
+  ],
+  notes:{
+    summary:"Summit Healthcare Linen (3 tunnels, high volume, regularly audited) wants to cut chemical spend and produce airtight compliance documentation. Strong fit for Catalyst dosing + wash-aisle controls. Buying against a Q3 budget cycle.",
+    qual:{Need:"Chemical cost + compliance reporting",Authority:"Director of Ops",Timeline:"Q3 budget cycle",Budget:"Cost-out justified by chemical savings"},
+    actions:["Send sample compliance/audit report","Prepare chemical-savings estimate for 3 tunnels","Priya to run 30-min call (Mon 2:00 PM ET)"],
+    objections:["Needs proof the records satisfy auditors","Asked about service coverage in the region"],
+    gap:"Asked specifically for exportable, audit-ready compliance reports — a packaged compliance-reporting export is a recurring request worth noting.",
+    sentiment:"Practical and positive; compliance is the emotional driver, savings the justification."
+  },
+  profile:{interest:["Catalyst Chemical","Wash Aisle Controls"],pains:["Rising chemical cost","Compliance documentation"],size:"3 tunnels · high volume",timeline:"Q3 budget cycle",channels:["Off-hours phone call"],meeting:"Mon, Jun 15 · 2:00 PM ET — Priya Nair"}
+},
+{
+  id:"c3", name:"Tom Becker", title:"General Manager",
+  company:"Harbor Hospitality Laundry", location:"Savannah, GA · ~$16M",
+  channel:"Phone", off:true, when:"Sun · 6:05 PM", interest:"LOIS monitoring + PulseNet productivity",
+  resp:"Answered by Sof on a Sunday evening · human team was offline",
+  who:"Marcus Bell", stage:"Meeting Booked",
+  placement:{day:1,time:"10:00 AM",hour:10},
+  steps:[
+    {ai:"Thanks for calling Softrol — this is Sof, the AI assistant. The team's offline this evening, but I can help and line up a follow-up. What's on your mind?",
+     opts:["I run two hospitality laundry plants and I'm flying blind across both.","I can't see what's happening across my two plants, and labor tracking is gut feel."]},
+    {ai:"That's exactly what LOIS is for — live plant performance on any device, multiple plants from one login, with PulseNet reporting labor by station and shift. How soon do you want eyes on both plants?",
+     opts:["As soon as realistically possible — without hiring an analyst.","Quickly, but I'd want to start lean."]},
+    {ai:"Understood — most operators start with LOIS for visibility, then layer PulseNet. Let's get you with Marcus Bell to map it across both plants. Tuesday 10:00 AM ET or Thursday 9:00 AM ET?",
+     isSlot:true, times:["Tue, Jun 16 · 10:00 AM ET","Thu, Jun 18 · 9:00 AM ET"], placements:[{day:1,time:"10:00 AM",hour:10},{day:3,time:"9:00 AM",hour:9}], opts:["Tuesday 10:00 AM works.","Thursday 9:00 AM is better."]},
+    {ai:"Great — {time} with Marcus, invite incoming. He'll be ready to talk multi-plant setup and what it takes to go live. Thanks, Tom.", final:true, with:"Marcus Bell"}
+  ],
+  notes:{
+    summary:"Harbor Hospitality Laundry runs two plants with no cross-plant visibility and gut-feel labor tracking. Wants visibility without adding headcount. Strong fit for LOIS (multi-plant monitoring) with PulseNet for labor. Wants to move quickly.",
+    qual:{Need:"Multi-plant visibility + labor tracking",Authority:"General Manager (decision-maker)",Timeline:"ASAP",Budget:"Wants fast payback, start lean"},
+    actions:["Map LOIS across both plants","Show multi-plant single-login view","Marcus to run 30-min call (Tue 10:00 AM ET)"],
+    objections:["Wants to start small and prove value","Concerned about IT/integration effort"],
+    gap:"Asked for mobile push alerts and self-service custom reporting — both recurring asks in the monitoring segment.",
+    sentiment:"Eager and decisive; values simplicity over features."
+  },
+  profile:{interest:["LOIS Monitoring","PulseNet (PPS)"],pains:["No cross-plant visibility","Gut-feel labor tracking"],size:"2 plants",timeline:"ASAP",channels:["Off-hours phone call"],meeting:"Tue, Jun 16 · 10:00 AM ET — Marcus Bell"}
+}
+];
+
+/* ----- Website form leads (AI responded immediately) ----- */
+const WEBLEADS = [
+{
+  id:"w1", name:"Janet Powell", title:"Operations Manager",
+  company:"Lakeside Linen Service", location:"Columbus, OH · ~$22M",
+  channel:"Email", interest:"Soil Sort System", when:"Today · 9:12 AM",
+  resp:"Sof replied by email 38 seconds after the form was submitted",
+  who:"Marcus Bell", stage:"In Progress", placement:null,
+  form:{Email:"jpowell@lakesidelinen.com",Phone:"(614) 555-0148","Preferred contact":"Email","First name":"Janet","Last name":"Powell"},
+  formMsg:"We're looking at automating our soil sort. What are the options for a mid-size plant, and roughly what's involved?",
+  steps:[
+    {ai:"Hi Janet — thanks for reaching out to Softrol. Quick answer: for a mid-size plant we'd look at our automated Soil Sort System, which sorts by customer or goods type and feeds your wash aisle steadily — most plants do it to cut sorting labor and lift throughput. To point you to the right config: about what daily volume are you running, and is sorting manual today?",
+     subj:"Re: Soil sort options for Lakeside Linen", opts:["~40,000 lbs/day, all manual right now","Still scoping volume — just exploring"]},
+    {ai:"Got it — that's squarely in the range where automated soil sort pays back fast, usually against the labor you're spending to sort by hand. The best next step is a 30-minute scoping call with one of our sales engineers, who'll size it to your plant and give you a real budgetary range. I have two openings: Tuesday 2:00 PM ET or Thursday 10:00 AM ET — which works?",
+     subj:"Re: Soil sort options for Lakeside Linen", isSlot:true, times:["Tue, Jun 16 · 2:00 PM ET","Thu, Jun 18 · 10:00 AM ET"], placements:[{day:1,time:"2:00 PM",hour:14},{day:3,time:"10:00 AM",hour:10}], opts:["Tuesday 2:00 PM works","Thursday 10:00 AM is better"]},
+    {ai:"Perfect — you're booked with Marcus Bell, Sales Engineer, for {time}. You'll get a calendar invite and a short soil-sort overview by email, and Marcus will already have your plant context so you can jump right in. Talk soon!",
+     subj:"Confirmed: your Softrol scoping call", final:true, with:"Marcus Bell"}
+  ],
+  profile:{interest:["Soil Sort System"],pains:["Manual soil sorting","Sorting labor cost"],size:"mid-size plant",timeline:"Evaluating",channels:["Website form (Email)"],meeting:null}
+},
+{
+  id:"w2", name:"Mike Sorensen", title:"Plant Supervisor",
+  company:"Cardinal Uniform Rental", location:"Indianapolis, IN · ~$19M",
+  channel:"Text", interest:"Garment Sort System", when:"Today · 8:01 AM",
+  resp:"Sof replied by text 22 seconds after the form was submitted",
+  who:"Marcus Bell", stage:"In Progress", placement:null,
+  form:{Email:"msorensen@cardinaluniform.com",Phone:"(317) 555-0193","Preferred contact":"Text","First name":"Mike","Last name":"Sorensen"},
+  formMsg:"Need faster garment sorting before summer. Can someone reach out?",
+  steps:[
+    {ai:"Hi Mike, this is Sof from Softrol Systems — thanks for reaching out about garment sorting. Quick one to point you right: what's driving the summer deadline — a volume jump, or are you behind on shipping today?",
+     opts:["A new contract starting in summer","We're already behind by mid-afternoon"]},
+    {ai:"Makes sense — either way, a modular garment sort system is the fix, and it scales in the space you've got. Best next step is a 30-minute call with our sales engineer to size it. Want Wednesday 1:00 PM ET or Friday 11:00 AM ET?",
+     isSlot:true, times:["Wed, Jun 17 · 1:00 PM ET","Fri, Jun 19 · 11:00 AM ET"], placements:[{day:2,time:"1:00 PM",hour:13},{day:4,time:"11:00 AM",hour:11}], opts:["Wednesday 1 PM","Friday 11 AM"]},
+    {ai:"Done ✅ You're set with Marcus Bell for {time}. Invite incoming by text and email — he'll have your details, so no need to repeat yourself. Talk soon, Mike!",
+     final:true, with:"Marcus Bell"}
+  ],
+  profile:{interest:["Garment Sort System"],pains:["Slow garment sorting","Summer deadline"],size:"—",timeline:"Before summer",channels:["Website form (Text)"],meeting:null}
+},
+{
+  id:"w3", name:"Denise Carter", title:"VP of Operations",
+  company:"Coastal Industrial Laundry", location:"Tampa, FL · ~$31M",
+  channel:"Phone", interest:"Wash Aisle Controls + Chemical Dosing", when:"Today · 11:30 AM",
+  resp:"Preferred contact was phone — Sof called back in 52 seconds and booked a meeting",
+  who:"Priya Nair", stage:"Meeting Booked", placement:{day:3,time:"3:00 PM",hour:15},
+  form:{Email:"dcarter@coastalindustrial.com",Phone:"(813) 555-0166","Preferred contact":"Phone","First name":"Denise","Last name":"Carter"},
+  formMsg:"Interested in wash aisle controls and chemical dosing. Please call.",
+  callback:true,
+  transcript:[
+    ["ai","Sof · AI SDR","Hi, is this Denise? This is Sof, Softrol Systems' AI assistant — you just asked us to call about wash-aisle controls and chemical dosing, so I wanted to reach you right away. Is now an okay moment?"],
+    ["cust","Denise Carter","Oh — that was fast. Yes, go ahead."],
+    ["ai","Sof · AI SDR","Great. So I can point you the right way — what's prompting the look: aging washer controls, chemical spend, or the reporting side?"],
+    ["cust","Denise Carter","Honestly all three. Our wash-aisle controls are old, chemical spend is higher than it should be, and I get almost no usable reporting."],
+    ["ai","Sof · AI SDR","That's a common combination, and it's fixable without ripping everything out. Our wash-aisle controls retrofit onto existing machines, and Catalyst handles dosing with flow-meter accuracy plus full dose records — which covers your reporting gap too. How many washers are we talking about?"],
+    ["cust","Denise Carter","Eight, across two aisles."],
+    ["ai","Sof · AI SDR","Very workable. The right next step is a 30-minute call with Priya Nair, our chemical and wash-aisle engineer, to scope a retrofit and estimate the chemical savings. Are you generally better mornings or afternoons?"],
+    ["cust","Denise Carter","Afternoons."],
+    ["ai","Sof · AI SDR","Then I'll put you with Priya on Thursday at 3:00 PM ET. You'll get a calendar invite and a short overview, and she'll be ready on retrofit and savings. Thanks for the quick chat, Denise — talk soon."]
+  ],
+  notes:{
+    summary:"Coastal Industrial Laundry (8 washers, two aisles) has aging wash-aisle controls, higher-than-needed chemical spend, and poor reporting. Strong fit for a wash-aisle retrofit + Catalyst dosing, which also closes the reporting gap. Sof reached her by phone within a minute of the form and booked a scoping call.",
+    qual:{Need:"Controls retrofit + chemical savings + reporting",Authority:"VP of Operations (decision-maker)",Timeline:"Active now",Budget:"Justified by chemical savings"},
+    actions:["Scope wash-aisle retrofit for 8 washers","Estimate chemical savings with Catalyst","Priya to run 30-min call (Thu 3:00 PM ET)"],
+    objections:["Wary of a heavy rip-and-replace project"],
+    gap:"Reinforces demand for built-in reporting/exports tied to chemical dosing.",
+    sentiment:"Pleasantly surprised by the instant callback; engaged and ready."
+  },
+  profile:{interest:["Wash Aisle Controls","Catalyst Chemical"],pains:["Aging controls","Chemical overspend","Poor reporting"],size:"8 washers · 2 aisles",timeline:"Active now",channels:["Website form (Phone)","AI callback"],meeting:"Thu, Jun 18 · 3:00 PM ET — Priya Nair"}
+}
+];
+
+/* ----- Meeting Co-pilot: human-led meetings the AI analyzed ----- */
+const MEETINGS = [
+{
+  id:"m1", lead:"Dale Morrison", company:"Crestline Uniform & Linen", rep:"Marcus Bell",
+  when:"Mon, Jun 8 · 11:00 AM ET", dur:"28 min", product:"Garment Sort System", stage:"Proposal",
+  transcript:[
+    ["rep","Marcus (Softrol)","Dale, thanks for making time. I've got Sof's notes from your call last week, so I know footprint is the headline — I pulled the sealed drawings for the 24-rail modular config, and it lands in about 4,200 square feet."],
+    ["cust","Dale Morrison","Okay, that's better than I expected. The competitor's compact unit is smaller though."],
+    ["rep","Marcus (Softrol)","It is, but theirs caps out below your throughput — at 12,000 a day you'd outgrow it within a year. Ours scales without a new footprint, and it ties straight into your existing overhead rail."],
+    ["cust","Dale Morrison","That rail integration is important. What about cost versus just adding a shift?"],
+    ["rep","Marcus (Softrol)","That's the ROI model I'll build — one added manual shift versus the system, plus the two contracts you turned away. Most plants in your range see payback inside 18 months."],
+    ["cust","Dale Morrison","If the numbers hold, my owner will want a site visit before signing."],
+    ["rep","Marcus (Softrol)","Easy — I'll come measure the bay and confirm the rail tie-in. I'll have the ROI model and footprint drawings to you within a week, then we schedule the visit."]
+  ],
+  notes:{
+    summary:"Follow-up call confirmed strong fit for the modular 24-rail garment sort (≈4,200 sq ft) with integration to Crestline's existing overhead rail. Footprint vs. the competitor's compact unit is the central tension; throughput ceiling is Softrol's counter. Next: ROI model and an on-site measure before owner sign-off.",
+    discussed:["24-rail modular footprint (~4,200 sq ft)","Integration with existing overhead rail","ROI vs. one added manual shift + recovered contracts","Competitor's compact unit and its throughput ceiling"],
+    actions:["Send sealed footprint drawings","Build ROI model vs. one shift (target payback <18 mo)","Schedule on-site bay measurement"],
+    next:"On-site scoping visit to measure the bay; full proposal within one week."
+  },
+  insights:{objection:"Footprint vs. competitor's compact unit",competitor:"Yes — compact-unit vendor",risk:"Medium-High — footprint perception could lose it",gap:"Smaller-footprint garment sorter"}
+},
+{
+  id:"m2", lead:"Rosa Alvarez", company:"Summit Healthcare Linen", rep:"Priya Nair",
+  when:"Tue, Jun 9 · 2:00 PM ET", dur:"31 min", product:"Catalyst Chemical + Wash Aisle", stage:"Evaluating",
+  transcript:[
+    ["rep","Priya (Softrol)","Hi Rosa — thanks for hopping on. I read Sof's notes from when you reached us over the weekend, so I know the two priorities are chemical cost and airtight compliance records. I brought a sample compliance report so we can start right there."],
+    ["cust","Rosa Alvarez","Perfect — that's exactly it. This report is what I've been trying to produce by hand. The accuracy is an easy internal sell; my worry is support if something goes down."],
+    ["rep","Priya (Softrol)","Fair. We have regional service coverage and remote diagnostics through LOIS, so most issues get caught before they're outages. I'll put our response-time commitments in writing."],
+    ["cust","Rosa Alvarez","That would help. On savings — what's realistic across three tunnels?"],
+    ["rep","Priya (Softrol)","I'll model it on your actual chemical spend, but operators your size typically see a meaningful double-digit reduction. I'll send the estimate with the report."]
+  ],
+  notes:{
+    summary:"Picking up from Sof's weekend call, the sample compliance report landed immediately — it directly answers Summit's manual-documentation pain. Primary concern shifted from product to service/support coverage. Chemical-savings estimate to follow on actual spend.",
+    discussed:["Sample audit-ready compliance report","Service coverage and response-time commitments","Chemical savings estimate across 3 tunnels"],
+    actions:["Send written service/response-time commitments","Model chemical savings on actual spend","Share full compliance report sample"],
+    next:"Send service SLAs + savings estimate; reconvene to confirm Q3 budget placement."
+  },
+  insights:{objection:"Service & support coverage in region",competitor:"None named",risk:"Low-Medium — strong fit, support reassurance pending",gap:"Packaged compliance / audit-report export"}
+},
+{
+  id:"m3", lead:"Mike Sorensen", company:"Cardinal Uniform Rental", rep:"Marcus Bell",
+  when:"Fri, Jun 5 · 1:30 PM ET", dur:"22 min", product:"Garment Sort System", stage:"Negotiation",
+  transcript:[
+    ["rep","Marcus (Softrol)","Mike, good to talk. Sof passed me everything from your website inquiry — faster garment sorting before summer, modular fit — so let's pick up there. What's the constraint that worries you most?"],
+    ["cust","Mike Sorensen","Honestly, space. I've got a vendor quoting a really compact sorter and that's tempting purely on footprint."],
+    ["rep","Marcus (Softrol)","I won't pretend footprint isn't a real factor. The trade-off is throughput and headroom — their compact unit caps out, ours scales as your contract volume grows. Let me get you exact footprint numbers so it's an honest comparison."],
+    ["cust","Mike Sorensen","If you had something as small as theirs, this would be a quick yes."]
+  ],
+  notes:{
+    summary:"Continuing from Sof's website handoff, interest is strong but footprint is the deciding factor, and a competitor's compact sorter is the front-runner on space alone. Throughput and expandability are Softrol's levers, but Mike explicitly said a smaller unit would close the deal quickly.",
+    discussed:["Modular config in a constrained footprint","Competitor's compact sorter (footprint advantage)","Throughput vs. footprint trade-off"],
+    actions:["Send exact footprint comparison","Quantify throughput/expandability advantage"],
+    next:"Provide honest footprint comparison; risk stays high without a compact option."
+  },
+  insights:{objection:"Footprint — competitor's compact unit",competitor:"Yes — compact-unit vendor (front-runner)",risk:"High — losing on space alone",gap:"Smaller-footprint garment sorter"}
+}
+];
+
+/* derived: all leads */
+const ALL = [
+  ...CALLS.map(c=>({id:c.id,kind:"call",name:c.name,company:c.company,channel:c.channel,off:true,when:c.when,interest:c.interest,get stage(){return c.stage;}})),
+  ...WEBLEADS.map(w=>({id:w.id,kind:"web",name:w.name,company:w.company,channel:w.channel,off:false,when:w.when,interest:w.interest,get stage(){return w.stage;}}))
+];
+
+/* ========================== NAV / ROUTER ========================== */
+const NAVS = [
+  {id:"dashboard",label:"Dashboard",icon:"dash"},
+  {id:"calendar",label:"Calendar",icon:"cal",badge:null},
+  {id:"calls",label:"Off-Hours Calls",icon:"phone",badge:CALLS.length},
+  {id:"webleads",label:"Website Leads",icon:"globe",badge:WEBLEADS.length},
+  {id:"allleads",label:"All Leads",icon:"layers",badge:ALL.length},
+  {id:"copilot",label:"Call Co-pilot",icon:"spark",badge:MEETINGS.length}
+];
+const TITLES = {dashboard:"Dashboard",calendar:"Calendar",calls:"Off-Hours Calls",webleads:"Website Leads",allleads:"All Leads",copilot:"Call Co-pilot"};
+
+function buildNav(active){
+  document.getElementById("nav").innerHTML = NAVS.map(n=>`
+    <button class="nav-item ${n.id===active?"active":""}" data-nav="${n.id}">
+      ${ico(n.icon)} <span>${n.label}</span>${n.badge!=null?`<span class="badge">${n.badge}</span>`:""}
+    </button>`).join("");
+}
+function go(view){
+  buildNav(view);
+  document.getElementById("pageTitle").textContent = TITLES[view];
+  document.getElementById("crumb").textContent = "";
+  const c = document.getElementById("content"); c.scrollTop=0;
+  ({dashboard:renderDashboard,calendar:renderCalendar,calls:renderCalls,webleads:renderWebleads,allleads:renderAll,copilot:renderCopilot}[view])(c);
+}
+function setCrumb(t){ document.getElementById("crumb").textContent = t; }
+
+/* ---------- lead stages (pipeline tracking) ---------- */
+const STAGES=[["New","s-new"],["In Progress","s-prog"],["Meeting Booked","s-booked"],["Closed – Won","s-won"],["Closed – Lost","s-lost"]];
+const stageClass=s=>{const f=STAGES.find(x=>x[0]===s);return f?f[1]:"s-booked";};
+const stageBadge=s=>`<span class="badge2 b-stage ${stageClass(s)}">${esc(s)}</span>`;
+function stageControl(ent){
+  return `<div class="stagebox"><span class="lab">Pipeline stage</span><div class="stage-pills" id="stagePills">`+
+    STAGES.map(([n,cls])=>`<button class="spill ${cls} ${ent.stage===n?'on':''}" data-stage="${esc(n)}">${esc(n)}</button>`).join("")+`</div></div>`;
+}
+function wireStage(ent){
+  const box=document.getElementById("stagePills"); if(!box) return;
+  const paint=()=>{box.innerHTML=STAGES.map(([n,cls])=>`<button class="spill ${cls} ${ent.stage===n?'on':''}" data-stage="${esc(n)}">${esc(n)}</button>`).join("");
+    box.querySelectorAll("[data-stage]").forEach(b=>b.onclick=()=>{ent.stage=b.dataset.stage;paint();const hb=document.getElementById("stageHeadBadge");if(hb)hb.innerHTML=stageBadge(ent.stage);toast(ent.name.split(" ")[0]+" moved to “"+ent.stage+"”.");});};
+  paint();
+}
+
+/* ---------- calendar (booked meetings land here) ---------- */
+const WEEK=[{dow:"Mon",dt:"15"},{dow:"Tue",dt:"16"},{dow:"Wed",dt:"17"},{dow:"Thu",dt:"18"},{dow:"Fri",dt:"19"}];
+const engClass=w=>/priya/i.test(w||"")?"eng-priya":"eng-marcus";
+function getEvents(){
+  const evs=[];
+  CALLS.forEach(c=>{if(c.placement)evs.push({...c.placement,name:c.name,company:c.company,who:c.who,kind:"call",id:c.id});});
+  WEBLEADS.forEach(w=>{if(w.placement)evs.push({...w.placement,name:w.name,company:w.company,who:w.who,kind:"web",id:w.id});});
+  return evs.sort((a,b)=>a.day-b.day||a.hour-b.hour);
+}
+function renderCalendar(c){
+  const evs=getEvents(), byDay=d=>evs.filter(e=>e.day===d);
+  c.innerHTML=`<p class="pageintro">Every meeting Sof books lands here automatically, on the right rep's calendar — no manual entry. Book one of the in-progress website leads and watch it drop onto the week. (Week of June 15–19, 2026.)</p>
+    <div class="cal-wrap"><div class="cal-grid">${WEEK.map((d,i)=>`
+      <div class="cal-col"><div class="cal-head"><div class="dow">${d.dow}</div><div class="dt">Jun ${d.dt}</div></div>
+        <div class="cal-body">${byDay(i).length?byDay(i).map(e=>`
+          <button class="cal-ev ${engClass(e.who)}" data-ev="${e.kind}:${e.id}">
+            <div class="t">${esc(e.time)}</div><div class="n">${esc(e.name)}</div>
+            <div class="c">${esc(e.company)}</div><div class="w">${esc((e.who||"").split(" ")[0])}</div>
+          </button>`).join(""):'<div class="cal-empty">·</div>'}</div>
+      </div>`).join("")}</div></div>
+    <p class="secn" style="margin-top:22px">Agenda · ${evs.length} meetings</p>
+    <div class="card list">${evs.map(e=>`
+      <button class="lrow" data-ev="${e.kind}:${e.id}">
+        <span class="av" style="${/priya/i.test(e.who)?'background:linear-gradient(135deg,#3b82f6,#1d4ed8)':''}">${initials(e.name)}</span>
+        <span class="main-c"><span class="nm">${esc(e.name)} · ${esc(e.company)}</span><span class="co">with ${esc(e.who)}</span></span>
+        <span class="mid">${esc(WEEK[e.day].dow)}, Jun ${esc(WEEK[e.day].dt)}</span>
+        <span class="rt"><span class="badge2 b-booked">${esc(e.time)}</span></span>
+        <span class="chev">›</span>
+      </button>`).join("")}</div>`;
+  c.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.ev.split(":");openFrom(k==="call"?"calls":"webleads",id);});
+}
+function miniCalHTML(){
+  const evs=getEvents(), byDay=d=>evs.filter(e=>e.day===d);
+  return `<div class="mcal">${WEEK.map((d,i)=>`
+    <div class="d"><div class="h">${d.dow} ${d.dt}</div>
+      ${byDay(i).map(e=>`<button class="chip ${engClass(e.who)}" data-ev="${e.kind}:${e.id}">${esc(e.time)} · ${esc(e.name.split(" ")[0])}</button>`).join("")}
+    </div>`).join("")}</div>`;
+}
+
+/* ========================== VIEWS ========================== */
+function renderDashboard(c){
+  const kpis=[
+    {ic:"phone",n:"14",l:"Off-hours calls answered",d:"▲ 9 recovered after hours"},
+    {ic:"globe",n:"22",l:"Website leads responded",d:"100% within 1 minute"},
+    {ic:"clock",n:"41<small>s</small>",l:"Median first response",d:"▼ from a 42-hour average"},
+    {ic:"cal",n:"19",l:"Meetings booked by Sof",d:"every lead routed to a human"}
+  ];
+  const feed=[
+    {ic:"phone",bg:"b-phone",t:"<b>Dale Morrison</b> · Crestline Uniform & Linen",s:"Off-hours call answered — meeting booked with Marcus Bell",w:"Fri 7:43 PM",go:["calls","c1"]},
+    {ic:"mail",bg:"b-email",t:"<b>Janet Powell</b> · Lakeside Linen Service",s:"Email form — replied in 38s, scheduling in progress",w:"Today 9:12 AM",go:["webleads","w1"]},
+    {ic:"phone",bg:"b-phone",t:"<b>Denise Carter</b> · Coastal Industrial Laundry",s:"Phone-preferred form — Sof called back in 52s, booked",w:"Today 11:30 AM",go:["webleads","w3"]},
+    {ic:"spark",bg:"b-email",t:"<b>Call analyzed</b> · Marcus × Dale (Crestline)",s:"Call Co-pilot captured 3 action items and a product-gap flag",w:"Mon 11:00 AM",go:["copilot","m1"]},
+    {ic:"chat",bg:"b-text",t:"<b>Mike Sorensen</b> · Cardinal Uniform Rental",s:"Text form — scheduling in progress",w:"Today 8:01 AM",go:["webleads","w2"]}
+  ];
+  const pipe=[["New",5,"#1d4ed8"],["In Progress",6,"#b45309"],["Meeting Booked",19,"#0f766e"],["Closed – Won",5,"#15803d"]];
+  const pmax=Math.max(...pipe.map(p=>p[1]));
+  const srcs=[
+    {l:"Off-hours phone calls",v:14,pct:64,col:"#1d4ed8"},
+    {l:"Website — email & text",v:15,pct:68,col:"#0f766e"},
+    {l:"Website — phone callback",v:7,pct:32,col:"#15803d"}
+  ];
+  c.innerHTML = `
+    <p class="pageintro">Everything below was handled by Sof while your team focused elsewhere — including nights and weekends. Every lead ends with a meeting on a human's calendar.</p>
+    <div class="kpis">${kpis.map(k=>`
+      <div class="kpi"><div class="icn">${ico(k.ic,"")}</div><div class="n">${k.n}</div><div class="l">${k.l}</div><div class="d">${k.d}</div></div>`).join("")}
+    </div>
+    <div class="card" style="margin-bottom:18px"><div class="card-h"><h3>This week</h3><button class="meta" id="openCal" style="border:none;background:none;color:var(--teal-d);font-weight:600;cursor:pointer">Open calendar ›</button></div>
+      ${miniCalHTML()}
+    </div>
+    <div class="two">
+      <div class="card"><div class="card-h"><h3>Recent activity</h3><span class="meta">last 72 hours</span></div>
+        <div class="feed">${feed.map((f,i)=>`
+          <button class="row" data-feed="${i}" style="border:none;background:none;width:100%;text-align:left">
+            <span class="ic ${f.bg}">${ico(f.ic,"")}</span>
+            <span class="tx"><span>${f.t}</span><br><span class="sub">${f.s}</span></span>
+            <span class="when">${f.w}</span>
+          </button>`).join("")}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="card"><div class="card-h"><h3>Lead pipeline</h3><span class="meta">this month</span></div>
+          <div class="pipe">${pipe.map(([n,v,col])=>`
+            <div class="pipe-row"><span class="nm">${n}</span><span class="track"><i style="background:${col}" data-w="${Math.round(v/pmax*100)}"></i></span><span class="ct">${v}</span></div>`).join("")}
+          </div>
+        </div>
+        <div class="card"><div class="card-h"><h3>Where leads came from</h3><span class="meta">this month</span></div>
+          <div class="src-bars">${srcs.map(s=>`
+            <div class="src-bar"><div class="t"><span>${s.l}</span><span class="v">${s.v}</span></div>
+            <div class="track"><i style="width:0;background:${s.col}" data-w="${s.pct}"></i></div></div>`).join("")}
+            <div style="font-size:11.5px;color:var(--muted);margin-top:4px">36 inbound leads · 0 missed · 19 meetings booked</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  c.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>{const f=feed[+b.dataset.feed];openFrom(f.go[0],f.go[1]);});
+  c.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.ev.split(":");openFrom(k==="call"?"calls":"webleads",id);});
+  const oc=document.getElementById("openCal"); if(oc) oc.onclick=()=>go("calendar");
+  setTimeout(()=>{c.querySelectorAll(".src-bar .track i").forEach(i=>i.style.width=i.dataset.w+"%");c.querySelectorAll(".pipe-row .track i").forEach(i=>i.style.width=i.dataset.w+"%");},60);
+}
+
+function leadRow(o){
+  const off = o.off;
+  return `<button class="lrow" data-open="${o.kind}:${o.id}">
+    <span class="av">${initials(o.name)}</span>
+    <span class="main-c"><span class="nm">${esc(o.name)}</span><span class="co">${esc(o.company)}</span></span>
+    <span class="mid">${esc(o.interest)}</span>
+    <span class="rt">${chanBadge(o.channel,off)}${o.stage?stageBadge(o.stage):""}<span class="when">${esc(o.when)}</span></span>
+    <span class="chev">›</span>
+  </button>`;
+}
+
+function renderCalls(c){
+  c.innerHTML = `<p class="pageintro">Inbound calls that came in after hours and were answered by Sof. Open any call to replay it interactively — you play the caller and pick what they say — and watch Sof qualify, book a meeting, and write the notes. Move the lead through your pipeline with the stage control.</p>
+  <div class="card list">${CALLS.map(x=>leadRow({...x,kind:"call",off:true})).join("")}</div>`;
+  wireOpen(c);
+}
+function renderWebleads(c){
+  c.innerHTML = `<p class="pageintro">Leads from Softrol's <b>Contact Sales</b> form. Sof responds instantly in the customer's preferred channel, answers their questions, and books a meeting for a human. Email and text leads are interactive — step through how the customer replies.</p>
+  <div class="card list">${WEBLEADS.map(x=>leadRow({...x,kind:"web",off:false})).join("")}</div>`;
+  wireOpen(c);
+}
+function renderAll(c){
+  c.innerHTML = `<p class="pageintro">Every lead Sof has handled — off-hours calls and website forms — in one place. ${ALL.length} leads, 0 missed, all routed to a booked meeting.</p>
+  <div class="card list">${ALL.map(o=>{
+     const r=(o.kind==="call"?CALLS:WEBLEADS).find(x=>x.id===o.id);
+     return leadRow({...o,interest:r.interest});
+  }).join("")}</div>`;
+  wireOpen(c);
+}
+function wireOpen(c){ c.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.open.split(":");openFrom(k==="call"?"calls":"webleads",id,true);});}
+function openFrom(view,id){
+  buildNav(view); document.getElementById("pageTitle").textContent=TITLES[view];
+  const c=document.getElementById("content"); c.scrollTop=0;
+  if(view==="calls") openCall(id);
+  else if(view==="webleads") openWeb(id);
+  else if(view==="copilot") openMeeting(id);
+  else go(view);
+}
+
+/* ---------- detail: profile + notes blocks ---------- */
+function profileCard(p){
+  const tags=a=>a&&a.length?a.map(x=>`<span class="tag">${esc(x)}</span>`).join(""):'<span style="color:var(--faint)">—</span>';
+  return `<div class="card"><div class="card-h"><h3>Living profile</h3><span class="meta">auto-assembled</span></div>
+    <div style="padding:13px 17px">
+      <div class="pfield"><span class="k">Interest</span><span class="v">${tags(p.interest)}</span></div>
+      <div class="pfield"><span class="k">Pain points</span><span class="v">${tags(p.pains)}</span></div>
+      <div class="pfield"><span class="k">Plant</span><span class="v">${esc(p.size)}</span></div>
+      <div class="pfield"><span class="k">Timeline</span><span class="v">${esc(p.timeline)}</span></div>
+      <div class="pfield"><span class="k">Channels</span><span class="v">${tags(p.channels)}</span></div>
+      <div class="pfield"><span class="k">Meeting</span><span class="v">${p.meeting?'<span style="color:var(--green);font-weight:650">'+esc(p.meeting)+'</span>':'<span style="color:var(--faint)">pending</span>'}</span></div>
+    </div></div>`;
+}
+function notesCard(n){
+  return `<div class="card"><div class="card-h"><h3>AI call notes</h3><span class="meta">written by Sof</span></div>
+   <div style="padding:15px 17px">
+    <div class="nblock"><h4>${ico("notes","")} Summary</h4><p>${esc(n.summary)}</p></div>
+    <div class="nblock"><h4>${ico("check","")} Qualification</h4><div class="qual">${Object.entries(n.qual).map(([k,v])=>`<div class="qcell"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("")}</div></div>
+    <div class="nblock"><h4>${ico("bulb","")} Recommended actions</h4>${n.actions.map(a=>`<div class="li"><span class="b">▸</span><span>${esc(a)}</span></div>`).join("")}</div>
+    <div class="nblock"><h4>${ico("warn","")} Objections</h4>${n.objections.map(o=>`<div class="li obj"><span class="b">!</span><span>${esc(o)}</span></div>`).join("")}</div>
+    ${n.gap?`<div class="nblock"><h4>${ico("flag","")} Product-gap signal</h4><div class="gapflag"><b>⚑ </b>${esc(n.gap)}</div></div>`:""}
+    <div class="nblock"><h4>${ico("user","")} Sentiment</h4><p>${esc(n.sentiment)}</p></div>
+   </div></div>`;
+}
+function transcriptCard(title,meta,turns){
+  return `<div class="card"><div class="card-h"><h3>${title}</h3><span class="meta">${meta}</span></div>
+   <div class="transcript">${turns.map(t=>`<div class="turn ${t[0]}"><div class="who">${esc(t[1])}</div><div class="tx">${esc(t[2])}</div></div>`).join("")}</div></div>`;
+}
+function dHead(r,extraTags){
+  return `<button class="back" id="backBtn">‹ Back</button>
+  <div class="dhead"><div class="av">${initials(r.name)}</div>
+    <div><div class="nm">${esc(r.name)}</div><div class="ti">${esc(r.title)}</div><div class="co">${esc(r.company)} · ${esc(r.location)}</div>
+      <div class="tags">${extraTags}</div></div>
+  </div>`;
+}
+function actionRow(items){
+  return `<div class="actions">${items.map((a,i)=>`<button class="abtn ${a.p?"primary":""}" data-act="${i}">${ico(a.ic,"")}${a.l}</button>`).join("")}</div>`;
+}
+function wireBack(){ const b=document.getElementById("backBtn"); if(b) b.onclick=()=>go(currentView()); }
+function currentView(){ const a=document.querySelector(".nav-item.active"); return a?a.dataset.nav:"dashboard"; }
+
+function openCall(id){
+  setCrumb("Off-Hours Calls › "+id.toUpperCase());
+  const r=CALLS.find(x=>x.id===id); const c=document.getElementById("content");
+  c.innerHTML = dHead(r,`${chanBadge(r.channel,true)} <span id="stageHeadBadge">${stageBadge(r.stage)}</span>`)
+   + `<div class="respnote">${ico("check","")} ${esc(r.resp)} · ${esc(r.when)}</div>`
+   + stageControl(r)
+   + `<div class="detail-grid">
+        <div class="card"><div class="card-h"><h3>Replay the call — you're the caller</h3><span class="meta">Phone · pick what they say</span></div>
+          <div class="convo" id="convo"></div>
+          <div class="opts" id="opts" style="padding:0 17px 16px"></div>
+        </div>
+        <div id="resultSlot" style="display:flex;flex-direction:column;gap:18px">
+          <div class="card"><div class="card-h"><h3>AI call notes</h3><span class="meta">Sof is listening…</span></div>
+            <div style="padding:16px 17px;color:var(--muted);font-size:13px;line-height:1.5">As the call wraps, Sof writes the summary, qualification, objections, and the product-gap signal here — and assembles the lead profile. Finish the call to see it populate.</div></div>
+        </div>
+      </div>`
+   + actionRow([{ic:"user",l:"Assign to engineer",p:true},{ic:"cal",l:"View on calendar"},{ic:"mail",l:"Send recap to lead"}]);
+  wireBack(); wireStage(r);
+  c.querySelectorAll("[data-act]").forEach((b,i)=>b.onclick=()=>{ if(i===1){go("calendar");return;} toast([ "Assigned to "+(r.who||"Marcus Bell")+" — full context attached.","","Recap email queued to "+r.name.split(" ")[0]+"."][i]); });
+  convoState={lead:r,i:0,chosenTime:null,chosenPlacement:null,mode:"call",onBook:(ent)=>{
+    document.getElementById("resultSlot").innerHTML=notesCard(ent.notes)+profileCard(ent.profile);
+  }};
+  stepConvo();
+}
+
+function openMeeting(id){
+  setCrumb("Call Co-pilot › "+id.toUpperCase());
+  const r=MEETINGS.find(x=>x.id===id); const c=document.getElementById("content");
+  const n=r.notes, ins=r.insights;
+  const notesBlock = `<div class="card"><div class="card-h"><h3>AI call notes</h3><span class="meta">written by Sof · for ${esc(r.rep)}</span></div>
+    <div style="padding:15px 17px">
+      <div class="nblock"><h4>${ico("notes","")} Summary</h4><p>${esc(n.summary)}</p></div>
+      <div class="nblock"><h4>${ico("chat","")} Discussed</h4>${n.discussed.map(d=>`<div class="li"><span class="b">›</span><span>${esc(d)}</span></div>`).join("")}</div>
+      <div class="nblock"><h4>${ico("check","")} Action items</h4>${n.actions.map(a=>`<div class="li"><span class="b">▸</span><span>${esc(a)}</span></div>`).join("")}</div>
+      <div class="nblock"><h4>${ico("arrow","")} Next step</h4><p>${esc(n.next)}</p></div>
+    </div></div>`;
+  const insightBlock = `<div class="card"><div class="card-h"><h3>Insights for the rep</h3><span class="meta">deal intelligence</span></div>
+    <div style="padding:14px 17px">
+      <div class="insight-line"><span class="k">Objection</span><span>${esc(ins.objection)}</span></div>
+      <div class="insight-line"><span class="k">Competitor</span><span>${esc(ins.competitor)}</span></div>
+      <div class="insight-line"><span class="k">Deal risk</span><span>${esc(ins.risk)}</span></div>
+      <div class="insight-line"><span class="k">Product gap</span><span style="color:#7c4a0e;font-weight:600">⚑ ${esc(ins.gap)}</span></div>
+    </div></div>`;
+  c.innerHTML = `<button class="back" id="backBtn">‹ Back</button>
+    <div class="dhead"><div class="av">${initials(r.lead)}</div>
+      <div><div class="nm">${esc(r.lead)} · ${esc(r.company)}</div>
+        <div class="ti">Call led by ${esc(r.rep)} · ${esc(r.when)} · ${esc(r.dur)}</div>
+        <div class="tags"><span class="badge2 b-neutral">${esc(r.product)}</span><span class="badge2 b-stage ${stageClass(r.stage)}">${esc(r.stage)}</span><span class="badge2 b-booked">Analyzed by Sof</span></div></div>
+    </div>
+    <div class="copilot-banner">${ico("spark","")}<div><b>This call was run by a human</b>, picking up from Sof's first contact. Sof listened, wrote the notes, and surfaced the intelligence below — so ${esc(r.rep.split(" ")[0])} can act on it instead of typing it up.</div></div>
+    <div class="detail-grid">
+      <div>${transcriptCard("Call transcript",esc(r.rep)+" &amp; "+esc(r.lead),r.transcript)}</div>
+      <div style="display:flex;flex-direction:column;gap:18px">${notesBlock}${insightBlock}</div>
+    </div>
+    ${actionRow([{ic:"check",l:"Add action items to CRM",p:true},{ic:"flag",l:"Flag product gap to Product team"},{ic:"mail",l:"Email summary to rep"}])}`;
+  wireBack();
+  c.querySelectorAll("[data-act]").forEach((b,i)=>b.onclick=()=>toast(["Action items pushed to CRM.","Product-gap flagged to the New Products team.","Summary emailed to "+r.rep+"."][i]));
+}
+
+/* ---------- website lead detail (interactive for email/text, transcript for phone) ---------- */
+function openWeb(id){
+  setCrumb("Website Leads › "+id.toUpperCase());
+  const r=WEBLEADS.find(x=>x.id===id); const c=document.getElementById("content");
+  const formCard = `<div class="card"><div class="card-h"><h3>Contact Sales — form submission</h3><span class="meta">softrol.com</span></div>
+    <div class="formcard">${Object.entries(r.form).map(([k,v])=>`<div class="fr"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`).join("")}
+      <div class="msg">“${esc(r.formMsg)}”</div>
+    </div></div>`;
+
+  if(r.callback){ // phone preferred → AI called back, show transcript
+    c.innerHTML = dHead(r,`${chanBadge("Phone",false)} <span class="badge2 b-off">Phone preferred</span> <span id="stageHeadBadge">${stageBadge(r.stage)}</span>`)
+      + `<div class="respnote">${ico("check","")} ${esc(r.resp)}</div>`
+      + stageControl(r)
+      + `<div class="detail-grid">
+           <div style="display:flex;flex-direction:column;gap:18px">${transcriptCard("AI callback transcript","Sof &amp; "+esc(r.name),r.transcript)}${formCard}</div>
+           <div style="display:flex;flex-direction:column;gap:18px">${notesCard(r.notes)}${profileCard(r.profile)}</div>
+         </div>`
+      + actionRow([{ic:"user",l:"Assign to engineer",p:true},{ic:"cal",l:"View on calendar"},{ic:"mail",l:"Send recap to lead"}]);
+    wireBack(); wireStage(r);
+    c.querySelectorAll("[data-act]").forEach((b,i)=>b.onclick=()=>{ if(i===1){go("calendar");return;} toast(["Assigned to "+(r.who||"Priya Nair")+".","","Recap queued to "+r.name.split(" ")[0]+"."][i]); });
+    return;
+  }
+
+  // email/text → interactive conversation
+  const channelNote = r.channel==="Email"
+    ? "Sof replied by email. Step through how the customer responds — every path ends in a booked meeting that lands on the calendar."
+    : "Sof replied by text. Step through how the customer responds — every path ends in a booked meeting that lands on the calendar.";
+  c.innerHTML = dHead(r,`${chanBadge(r.channel,false)} <span class="badge2 b-prog" id="statusBadge">Sof responding…</span> <span id="stageHeadBadge">${stageBadge(r.stage)}</span>`)
+    + `<div class="respnote">${ico("check","")} ${esc(r.resp)}</div>`
+    + stageControl(r)
+    + `<div class="detail-grid">
+        <div style="display:flex;flex-direction:column;gap:18px">${formCard}<div id="profSlot">${profileCard(r.profile)}</div></div>
+        <div class="card"><div class="card-h"><h3>${r.channel==="Email"?"Email conversation":"Text conversation"}</h3><span class="meta">${r.channel} · live</span></div>
+          <div class="convo" id="convo"></div>
+          <div class="opts" id="opts" style="padding:0 17px 16px"></div>
+        </div>
+      </div>`
+    + `<p style="font-size:12px;color:var(--muted);margin-top:14px">${esc(channelNote)}</p>`;
+  wireBack(); wireStage(r);
+  convoState={lead:r,i:0,chosenTime:null,chosenPlacement:null,mode:r.channel.toLowerCase(),onBook:null};
+  stepConvo();
+}
+
+let convoState=null;
+function aiBubble(step,r){
+  const conv=document.getElementById("convo");
+  const subj = step.subj?`<div class="subj">📧 ${esc(step.subj)}</div>`:"";
+  const txt = (step.ai||"").replace("{time}", convoState.chosenTime||"");
+  // typing indicator then message
+  const tdiv=document.createElement("div"); tdiv.className="cmsg ai"; tdiv.id="typing";
+  tdiv.innerHTML=`<div class="cav">S</div><div class="cbub"><div class="typing-c"><span></span><span></span><span></span></div></div>`;
+  conv.appendChild(tdiv); conv.scrollTop=conv.scrollHeight;
+  return new Promise(res=>setTimeout(()=>{
+    tdiv.remove();
+    const d=document.createElement("div"); d.className="cmsg ai";
+    d.innerHTML=`<div class="cav">S</div><div class="cbub">${subj}${esc(txt)}</div>`;
+    conv.appendChild(d); conv.scrollTop=conv.scrollHeight; res();
+  },650));
+}
+function custBubble(text){
+  const conv=document.getElementById("convo");
+  const d=document.createElement("div"); d.className="cmsg cust";
+  d.innerHTML=`<div class="cav">${initials(convoState.lead.name)}</div><div class="cbub">${esc(text)}</div>`;
+  conv.appendChild(d); conv.scrollTop=conv.scrollHeight;
+}
+async function stepConvo(){
+  const r=convoState.lead, step=r.steps[convoState.i], optsEl=document.getElementById("opts");
+  optsEl.innerHTML="";
+  await aiBubble(step,r);
+  if(step.final){
+    const sb=document.getElementById("statusBadge"); if(sb) sb.outerHTML='<span class="badge2 b-booked">Meeting booked</span>';
+    const conv=document.getElementById("convo");
+    const bc=document.createElement("div"); bc.className="bookcard";
+    bc.innerHTML=`<div class="bt">${ico("cal","")} Meeting scheduled</div><div class="bm">${esc(convoState.chosenTime)}</div><div class="bd">with ${esc(step.with)}, Sales Engineer · routed for a human to take from here</div>`;
+    conv.appendChild(bc); conv.scrollTop=conv.scrollHeight;
+    if(convoState.chosenTime) r.profile.meeting = convoState.chosenTime+" — "+step.with;
+    if(convoState.chosenPlacement) r.placement = convoState.chosenPlacement;
+    if(r.stage==="New"||r.stage==="In Progress") r.stage="Meeting Booked";
+    const hb=document.getElementById("stageHeadBadge"); if(hb) hb.innerHTML=stageBadge(r.stage);
+    const ps=document.getElementById("profSlot"); if(ps) ps.innerHTML=profileCard(r.profile);
+    if(convoState.onBook) convoState.onBook(r);
+    return;
+  }
+  const labels={call:"Caller says — pick one:",email:"Customer replies — pick one:",text:"Customer texts back — pick one:"};
+  optsEl.innerHTML=`<div class="lbl">${labels[convoState.mode]||"Pick one:"}</div>`+
+    step.opts.map((o,k)=>`<button class="opt" data-opt="${k}"><span class="role">${esc(r.name)}</span>${esc(o)}</button>`).join("");
+  optsEl.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.opt;
+    if(step.isSlot){ convoState.chosenTime=step.times[k]; if(step.placements) convoState.chosenPlacement=step.placements[k]; }
+    custBubble(step.opts[k]);
+    optsEl.innerHTML="";
+    convoState.i++;
+    stepConvo();
+  });
+}
+
+/* ---------- Meeting Co-pilot list + aggregate ---------- */
+function renderCopilot(c){
+  const objs=[
+    {l:"Footprint / floor space",p:31,amber:true},
+    {l:"Integration with existing equipment",p:24},
+    {l:"Capital approval / owner sign-off",p:18},
+    {l:"Service & support coverage",p:14},
+    {l:"Price vs. a competitor",p:13}
+  ];
+  c.innerHTML = `
+    <p class="pageintro">The New-Products layer. When a rep takes the call Sof booked, Sof analyzes the call, writes the notes, and surfaces what matters — objections, competitors, deal risk, and product gaps. Per-call help for the rep, and the roadmap signal for the team.</p>
+    <div class="agg">
+      <div class="card"><div class="card-h"><h3>Recurring objections</h3><span class="meta">across 31 analyzed calls</span></div>
+        <div class="bars">${objs.map(o=>`<div class="bar ${o.amber?"amber":""}"><div class="bl"><span>${o.l}</span><span class="pct">${o.p}%</span></div><div class="track"><i data-w="${o.p}"></i></div></div>`).join("")}</div>
+      </div>
+      <div class="gapbig">
+        <div class="ft">${ico("flag","")} Product-gap signal · for the New Products team</div>
+        <h3>A smaller-footprint garment sorter keeps coming up.</h3>
+        <p>“Footprint / floor space” is the #1 objection across analyzed calls, and 12 prospects this quarter explicitly asked for a compact sorter Softrol doesn't make — a defined mid-market segment, not noise.</p>
+        <div class="row">
+          <div class="st"><div class="sn">12</div><div class="sl">prospects requested it</div></div>
+          <div class="st"><div class="sn">$2.1M</div><div class="sl">influenced pipeline</div></div>
+          <div class="st"><div class="sn">3</div><div class="sl">deals at risk to a compact rival</div></div>
+        </div>
+      </div>
+    </div>
+    <p class="secn">Analyzed calls</p>
+    <div class="card list">${MEETINGS.map(m=>`
+      <button class="lrow" data-meet="${m.id}">
+        <span class="av">${initials(m.lead)}</span>
+        <span class="main-c"><span class="nm">${esc(m.lead)} · ${esc(m.company)}</span><span class="co">Led by ${esc(m.rep)} · ${esc(m.product)}</span></span>
+        <span class="mid">⚑ ${esc(m.insights.gap)}</span>
+        <span class="rt"><span class="badge2 b-stage ${stageClass(m.stage)}">${esc(m.stage)}</span><span class="when">${esc(m.when.split(" · ")[0])} · ${esc(m.dur)}</span></span>
+        <span class="chev">›</span>
+      </button>`).join("")}</div>`;
+  c.querySelectorAll("[data-meet]").forEach(b=>b.onclick=()=>{openMeeting(b.dataset.meet);});
+  setTimeout(()=>c.querySelectorAll(".bar .track i").forEach(i=>i.style.width=i.dataset.w+"%"),60);
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.innerHTML=ico("check","")+`<span>${esc(msg)}</span>`;
+  t.classList.add("show"); clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove("show"),2600);
+}
+
+/* ---------- live voice agent (ElevenLabs Conversational AI) ----------
+   Turns Sof into a REAL voice agent the reviewer can actually talk to.
+
+   To enable (≈10 min, see sof-voice-agent-prompt.md for full steps):
+     1. Create an agent at elevenlabs.io → Agents, paste the system prompt +
+        first message from sof-voice-agent-prompt.md, pick a voice, and set the
+        LLM (Claude works well). In the Advanced tab, DISABLE authentication
+        (the embed widget requires a public agent).
+     2. Copy the Agent ID and paste it below, replacing REPLACE_WITH_AGENT_ID.
+     3. Host this file over https (e.g. drag it onto Netlify Drop) so the
+        browser will grant microphone access — mic is blocked on file:// .
+
+   Until an Agent ID is set, the trial behaves exactly as before (no voice). */
+const SOF_VOICE_AGENT_ID = "agent_9801ktzk1wa0eq3s986ckzg0n0zg";
+
+function voiceEnabled(){ return SOF_VOICE_AGENT_ID && SOF_VOICE_AGENT_ID.indexOf("REPLACE_WITH_AGENT_ID")===-1; }
+function mountVoiceWidget(){
+  if(!voiceEnabled() || document.getElementById("sof-convai")) return;
+  if(!document.getElementById("eleven-convai-js")){
+    const s=document.createElement("script");
+    s.id="eleven-convai-js";
+    s.src="https://unpkg.com/@elevenlabs/convai-widget-embed";
+    s.async=true; s.type="text/javascript";
+    document.body.appendChild(s);
+  }
+  const w=document.createElement("elevenlabs-convai");
+  w.id="sof-convai";
+  w.setAttribute("agent-id",SOF_VOICE_AGENT_ID);
+  w.setAttribute("action-text","Talk to Sof");
+  w.setAttribute("start-call-text","Start voice call");
+  w.setAttribute("end-call-text","End call");
+  w.setAttribute("expand-text","Talk to Sof");
+  w.setAttribute("collapse-text","Minimize");
+  w.setAttribute("avatar-orb-color-1","#0F766E");
+  w.setAttribute("avatar-orb-color-2","#12A594");
+  document.body.appendChild(w);
+  const h=document.getElementById("voiceHint"); if(h) h.classList.remove("hidden");
+  setTimeout(()=>toast("Live voice is on — tap “Talk to Sof”, bottom-right, to speak with Sof."),700);
+}
+
+/* ---------- boot ---------- */
+function signIn(){
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  go("dashboard");
+  mountVoiceWidget();
+}
+document.getElementById("li-go").onclick=signIn;
+document.getElementById("li-pass").addEventListener("keydown",e=>{if(e.key==="Enter")signIn();});
+document.getElementById("logout").onclick=()=>{document.getElementById("app").classList.add("hidden");document.getElementById("login").classList.remove("hidden");};
+document.getElementById("nav") && document.getElementById("app").addEventListener("click",e=>{const b=e.target.closest("[data-nav]");if(b)go(b.dataset.nav);});
+</script>
+</body>
+</html>
